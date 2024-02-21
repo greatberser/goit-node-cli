@@ -3,6 +3,11 @@ import path from 'path';
 
 const contactPath = path.resolve("db", "contacts.json");
 
+async function updateContacts(contacts){
+    fs.writeFile(contactPath, JSON.stringify(contacts, null, 2));
+    return;
+}
+
 
 export async function listContacts() {
     const result = await fs.readFile(contactPath);
@@ -21,6 +26,7 @@ export async function removeContact(contactId) {
     if (index === -1) return null;
 
     const response = contacts.splice(index, 1);
+    await updateContacts(contacts);
     return response;
 }
   
@@ -28,13 +34,13 @@ export async function addContact(name, email, phone) {
     const contacts = await listContacts();
     const id = Math.random().toString(36).substr(2, 9);
 
-    const newContacts = {
+    const newContact = {
         id,
         name,
         email,
         phone
     }
-    contacts.push(newContacts);
-
-    return newContacts;
+    contacts.push(newContact);
+    await updateContacts(contacts);
+    return newContact;
 }
